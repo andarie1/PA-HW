@@ -9,7 +9,7 @@ class Address(BaseModel):
 
 
 class User(BaseModel):
-    name: str = Field(..., min_length=2, max_length=50)
+    name: str = Field(..., min_length=2, max_length=50, pattern=r'^[A-Za-z]+$')
     age: int = Field(..., ge=0, le=120)
     email: EmailStr = Field(..., min_length=10, max_length=50)
     is_employed: bool = Field(default=False)
