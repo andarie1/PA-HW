@@ -48,30 +48,46 @@ session.add_all([
 ])
 session.commit()
 
-# 2. Чтение данных
-# Извлеките все записи из таблицы categories. Для каждой категории извлеките и выведите все связанные с ней продукты, включая их названия и цены.
-# Задание 3. Обновление данных
-# Найдите в таблице products первый продукт с названием "Смартфон". Замените цену этого продукта на 349.99.
-# Задание 4. Агрегация и группировка
-# Используя агрегирующие функции и группировку, подсчитайте общее количество продуктов в каждой категории.
-# Задание 5. Группировка с фильтрацией
-# Отфильтруйте и выведите только те категории, в которых более одного продукта.
-
+# 1. Извлекаем все категории и их продукты
 all_categories = session.query(Category).all()
-print(all_categories)
+for category in all_categories:
+    print(f"Категория: {category.name}")
+    for product in category.products:
+        print(f"  - {product.name}: {product.price}$")
+    print()
 
-update_price = session.query(Category).get(1)
-if update_price:
-    update_price.price = 349.99
+# 2. Находим первый продукт и обновляем цену
+smartphone = session.query(Product).filter_by(name="Смартфон").first()
+if smartphone:
+    smartphone.price = 349.99
     session.commit()
 
-update_price = session.query(Category).get(1)
-print(update_price)
+# Проверяем изменение цены
+smartphone = session.query(Product).filter_by(name="Смартфон").first()
+print(f"Обновленный смартфон: {smartphone.name}, новая цена: {smartphone.price}$")
 
-count_products = session.query(Product.id).func.count().label('count').group_by(Product.name).all()
-print(count_products)
+# 3.
+category_counts = (
+    session.query(Category.name, func.count(Product.id).label("count"))
+    .join(Product)
+    .group_by(Category.id)
+    .all()
+)
+print("\nКоличество продуктов в каждой категории:")
+for category_name, count in category_counts:
+    print(f"{category_name}: {count} продуктов")
 
-
+# 4.
+categories_with_multiple_products = (
+    session.query(Category.name)
+    .join(Product)
+    .group_by(Category.id)
+    .having(func.count(Product.id) > 1)
+    .all()
+)
+print("\nКатегории с более чем одним продуктом:")
+for category_name in categories_with_multiple_products:
+    print(category_name[0])
 
 
 
