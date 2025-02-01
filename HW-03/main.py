@@ -3,40 +3,38 @@ from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import pandas as pd
 
 # Задача 1: Создаём экземпляр движка для подключения к SQLite базе данных в памяти.
-engine = create_engine('sqlite:///:memory:', echo=False)  # Отключаем логирование SQL-запросов для краткости.
+engine = create_engine('sqlite:///:memory:', echo=False)
 
 # Задача 2: Создаём базовый класс и сессию для взаимодействия с БД.
-Base = declarative_base()  # Используем declarative_base для определения моделей.
+Base = declarative_base()
 
-Session = sessionmaker(bind=engine)  # Создаём фабрику сессий.
-session = Session()  # Создаём экземпляр сессии.
+Session = sessionmaker(bind=engine)
+session = Session()
 
 # Задача 3: Определяем модель Product.
 class Product(Base):
-    __tablename__ = 'products'  # Название таблицы.
+    __tablename__ = 'products'
 
-    id = Column(Integer, primary_key=True)  # ID продукта, первичный ключ.
-    name = Column(String(100), nullable=False)  # Название продукта.
-    price = Column(Numeric, nullable=False)  # Цена.
-    in_stock = Column(Boolean, nullable=False, default=False)  # Наличие на складе.
-    category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)  # Внешний ключ на категорию.
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    price = Column(Numeric, nullable=False)
+    in_stock = Column(Boolean, nullable=False, default=False)
+    category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
 
-    # Связь с моделью Category.
     category = relationship('Category', back_populates='products')
 
 # Задача 4: Определяем модель Category.
 class Category(Base):
-    __tablename__ = 'categories'  # Название таблицы.
+    __tablename__ = 'categories'
 
-    id = Column(Integer, primary_key=True)  # ID категории, первичный ключ.
-    name = Column(String(100), nullable=False)  # Название категории.
-    description = Column(String(255), nullable=False)  # Описание категории.
-
-    # Связь с моделью Product.
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100), nullable=False)
+    description = Column(String(255), nullable=False)
+.
     products = relationship('Product', back_populates='category')
 
 # Задача 5: Создаём таблицы в базе данных.
-Base.metadata.create_all(engine)  # Создаём таблицы в базе.
+Base.metadata.create_all(engine)
 
 # Добавление данных в базу.
 category = Category(name="Electronics", description="Electronic gadgets and devices")
