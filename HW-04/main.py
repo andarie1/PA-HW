@@ -80,6 +80,7 @@ categories_with_multiple_products = (
     .having(func.count(Product.id) > 1)
     .all()
 )
+
 print("\nКатегории с более чем одним продуктом:")
 for category_name in categories_with_multiple_products:
     print(category_name[0])
