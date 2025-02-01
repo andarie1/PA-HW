@@ -12,7 +12,6 @@ class Category(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     description = Column(String)
-
     products = relationship("Product", back_populates="category")
 
 
@@ -23,14 +22,11 @@ class Product(Base):
     price = Column(Numeric, nullable=False)
     in_stock = Column(Boolean, default=True)
     category_id = Column(Integer, ForeignKey('categories.id'))
-
     category = relationship("Category", back_populates="products")
 
 
-# Пересоздаем таблицы
 Base.metadata.create_all(engine)
 
-# Добавляем категории и сразу получаем их объекты
 category_electronics = Category(name="Электроника", description="Гаджеты и устройства.")
 category_books = Category(name="Книги", description="Печатные книги и электронные книги.")
 category_clothing = Category(name="Одежда", description="Одежда для мужчин и женщин.")
@@ -38,7 +34,6 @@ category_clothing = Category(name="Одежда", description="Одежда дл
 session.add_all([category_electronics, category_books, category_clothing])
 session.commit()
 
-# Добавляем продукты
 session.add_all([
     Product(name="Смартфон", price=299.99, in_stock=True, category=category_electronics),
     Product(name="Ноутбук", price=499.99, in_stock=True, category=category_electronics),
@@ -66,7 +61,7 @@ if smartphone:
 smartphone = session.query(Product).filter_by(name="Смартфон").first()
 print(f"Обновленный смартфон: {smartphone.name}, новая цена: {smartphone.price}$")
 
-# 3.
+# 3. Подсчет продуктов по каждой категории
 category_counts = (
     session.query(Category.name, func.count(Product.id).label("count"))
     .join(Product)
@@ -77,7 +72,7 @@ print("\nКоличество продуктов в каждой категор�
 for category_name, count in category_counts:
     print(f"{category_name}: {count} продуктов")
 
-# 4.
+# 4. Категории где больше одного
 categories_with_multiple_products = (
     session.query(Category.name)
     .join(Product)
